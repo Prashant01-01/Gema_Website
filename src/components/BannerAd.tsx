@@ -31,11 +31,11 @@ export default function BannerAd({ position = "top" }: { position?: "top" | "bot
   if (!ad) return null;
 
   const content = (
-    <div className="w-full rounded-lg overflow-hidden">
+    <div className="w-full rounded-lg overflow-hidden max-h-28 sm:max-h-36 lg:max-h-44">
       <img
         src={ad.image_url}
         alt={ad.title}
-        className="w-full h-auto object-cover rounded-lg"
+        className="w-full h-full object-cover rounded-lg"
       />
     </div>
   );
