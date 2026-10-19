@@ -74,12 +74,11 @@ export default function Navbar() {
                 }
                 onMouseLeave={() => setOpenDropdown(null)}
               >
-                <Link
-                  href={item.href}
-                  className="px-3 py-2 text-sm font-semibold text-[var(--gray-800)] hover:text-[var(--primary)] transition-colors rounded-md hover:bg-red-50 flex items-center gap-1"
-                >
-                  {item.label}
-                  {item.children && (
+                {item.children ? (
+                  <span
+                    className="px-3 py-2 text-sm font-semibold text-[var(--gray-800)] hover:text-[var(--primary)] transition-colors rounded-md hover:bg-red-50 flex items-center gap-1 cursor-default select-none"
+                  >
+                    {item.label}
                     <svg
                       className="w-3.5 h-3.5 opacity-50"
                       fill="none"
@@ -93,8 +92,15 @@ export default function Navbar() {
                         d="M19 9l-7 7-7-7"
                       />
                     </svg>
-                  )}
-                </Link>
+                  </span>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="px-3 py-2 text-sm font-semibold text-[var(--gray-800)] hover:text-[var(--primary)] transition-colors rounded-md hover:bg-red-50 flex items-center gap-1"
+                  >
+                    {item.label}
+                  </Link>
+                )}
 
                 {item.children && openDropdown === item.label && (
                   <div className="absolute top-full left-0 mt-0 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
@@ -151,13 +157,19 @@ export default function Navbar() {
           <div className="px-4 py-3 space-y-1">
             {navItems.map((item) => (
               <div key={item.label}>
-                <Link
-                  href={item.href}
-                  className="block px-3 py-2 text-sm font-semibold text-[var(--gray-800)] hover:text-[var(--primary)] rounded-md hover:bg-red-50"
-                  onClick={() => !item.children && setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
+                {item.children ? (
+                  <span className="block px-3 py-2 text-sm font-semibold text-[var(--gray-800)] cursor-default select-none">
+                    {item.label}
+                  </span>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="block px-3 py-2 text-sm font-semibold text-[var(--gray-800)] hover:text-[var(--primary)] rounded-md hover:bg-red-50"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                )}
                 {item.children && (
                   <div className="pl-6 space-y-1">
                     {item.children.map((child) => (
