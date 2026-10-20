@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface Testimonial {
@@ -13,9 +13,10 @@ interface Testimonial {
 
 export default function TestimonialCarousel() {
   const [items, setItems] = useState<Testimonial[]>([]);
-  const [current, setCurrent] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [fade, setFade] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase
@@ -26,84 +27,85 @@ export default function TestimonialCarousel() {
       .then(({ data }) => setItems(data || []));
   }, []);
 
-  const goTo = useCallback((index: number) => {
-    setFade(false);
-    setTimeout(() => {
-      setCurrent(index);
-      setFade(true);
-    }, 300);
-  }, []);
-
   useEffect(() => {
-    if (items.length <= 1 || paused) return;
+    if (items.length <= 3 || paused) return;
     const timer = setInterval(() => {
-      goTo((current + 1) % items.length);
-    }, 5000);
+      setIsTransitioning(true);
+      setOffset((prev) => prev + 1);
+    }, 4000);
     return () => clearInterval(timer);
-  }, [items.length, current, paused, goTo]);
+  }, [items.length, paused]);
+
+  function handleTransitionEnd() {
+    if (offset >= items.length) {
+      setIsTransitioning(false);
+      setOffset(0);
+    }
+  }
 
   if (items.length === 0) return null;
 
-  const item = items[current];
+  const displayItems = items.length > 3
+    ? [...items, ...items.slice(0, 3)]
+    : items;
 
   return (
-    <section className="py-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 bg-[var(--gray-50)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-[var(--gray-800)] mb-2 text-center">What Our Members Say</h2>
         <p className="text-center text-[var(--gray-600)] mb-12">Trusted by the electrical trade community of Guwahati</p>
 
         <div
-          className="relative"
+          className="relative overflow-hidden"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <div className="text-center px-4">
-            <div className="text-6xl text-[var(--gold)] mb-4 leading-none">&ldquo;</div>
-            <p
-              className={`text-lg sm:text-xl text-[var(--gray-600)] italic leading-relaxed mb-8 max-w-2xl mx-auto transition-opacity duration-300 break-words ${fade ? "opacity-100" : "opacity-0"}`}
-            >
-              {item.quote}
-            </p>
-            <div className={`transition-opacity duration-300 ${fade ? "opacity-100" : "opacity-0"}`}>
-              <p className="font-bold text-[var(--gray-800)] text-lg">{item.name}</p>
-              <p className="text-[var(--gray-600)] text-sm">
-                {[item.designation, item.business_name].filter(Boolean).join(", ")}
-              </p>
-            </div>
-          </div>
-
-          {items.length > 1 && (
+          {items.length > 3 && (
             <>
               <button
-                onClick={() => goTo((current - 1 + items.length) % items.length)}
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-[var(--gray-800)] hover:bg-gray-50 transition-colors"
-                aria-label="Previous testimonial"
+                onClick={() => { setIsTransitioning(true); setOffset((p) => (p - 1 + items.length) % items.length); }}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center justify-center text-[var(--gray-800)] hover:bg-white transition-colors"
+                aria-label="Previous"
               >
                 ‹
               </button>
               <button
-                onClick={() => goTo((current + 1) % items.length)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-[var(--gray-800)] hover:bg-gray-50 transition-colors"
-                aria-label="Next testimonial"
+                onClick={() => { setIsTransitioning(true); setOffset((p) => p + 1); }}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center justify-center text-[var(--gray-800)] hover:bg-white transition-colors"
+                aria-label="Next"
               >
                 ›
               </button>
             </>
           )}
-        </div>
 
-        {items.length > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
-            {items.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === current ? "bg-[var(--primary)] w-6" : "bg-gray-300 hover:bg-gray-400"}`}
-                aria-label={`Go to testimonial ${i + 1}`}
-              />
-            ))}
+          <div className="px-6">
+            <div
+              ref={trackRef}
+              className={`flex gap-6 ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""}`}
+              style={{ transform: `translateX(calc(-${offset} * (33.333% + 8px)))` }}
+              onTransitionEnd={handleTransitionEnd}
+            >
+              {displayItems.map((item, i) => (
+                <div
+                  key={`${item.id}-${i}`}
+                  className="flex-shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="text-4xl text-[var(--gold)] mb-3 leading-none">&ldquo;</div>
+                  <p className="text-[var(--gray-600)] italic leading-relaxed mb-6 line-clamp-4 break-words">
+                    {item.quote}
+                  </p>
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="font-bold text-[var(--gray-800)]">{item.name}</p>
+                    <p className="text-sm text-[var(--gray-600)]">
+                      {[item.designation, item.business_name].filter(Boolean).join(", ")}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
