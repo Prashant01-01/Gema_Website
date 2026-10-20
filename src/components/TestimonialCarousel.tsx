@@ -60,7 +60,7 @@ export default function TestimonialCarousel() {
           <div className="text-center px-4">
             <div className="text-6xl text-[var(--gold)] mb-4 leading-none">&ldquo;</div>
             <p
-              className={`text-lg sm:text-xl text-[var(--gray-600)] italic leading-relaxed mb-8 max-w-2xl mx-auto transition-opacity duration-300 ${fade ? "opacity-100" : "opacity-0"}`}
+              className={`text-lg sm:text-xl text-[var(--gray-600)] italic leading-relaxed mb-8 max-w-2xl mx-auto transition-opacity duration-300 break-words ${fade ? "opacity-100" : "opacity-0"}`}
             >
               {item.quote}
             </p>
