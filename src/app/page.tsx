@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import BannerAd from "@/components/BannerAd";
+import EventGallery from "@/components/EventGallery";
 import { supabase } from "@/lib/supabase";
 
 interface Announcement { id: string; title: string; description: string; badge: string; }
@@ -118,6 +119,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <EventGallery />
 
       <section className="py-16 bg-[var(--gray-50)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
