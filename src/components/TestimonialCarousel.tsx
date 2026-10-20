@@ -91,8 +91,8 @@ export default function TestimonialCarousel() {
                   key={`${item.id}-${i}`}
                   className="flex-shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
                 >
-                  <div className="text-4xl text-[var(--gold)] mb-3 leading-none">&ldquo;</div>
-                  <p className="text-[var(--gray-600)] italic leading-relaxed mb-6 line-clamp-4 break-words">
+                  <div className="text-3xl text-[var(--gold)] mb-2 leading-none">&ldquo;</div>
+                  <p className="text-sm text-[var(--gray-600)] italic leading-relaxed mb-6 break-words">
                     {item.quote}
                   </p>
                   <div className="border-t border-gray-100 pt-4">
