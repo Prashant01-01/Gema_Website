@@ -77,8 +77,8 @@ export default function AdminTestimonials() {
           </div>
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-[var(--gray-600)] mb-1">Quote *</label>
-          <textarea value={form.quote} onChange={(e) => setForm({ ...form, quote: e.target.value })} required rows={3} placeholder="What they said about GEMA..." className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] resize-none" />
+          <label className="block text-sm font-medium text-[var(--gray-600)] mb-1">Quote * <span className={`font-normal ${form.quote.length > 200 ? "text-red-500" : "text-[var(--gray-600)]"}`}>({form.quote.length}/200)</span></label>
+          <textarea value={form.quote} onChange={(e) => { if (e.target.value.length <= 200) setForm({ ...form, quote: e.target.value }); }} required rows={3} placeholder="What they said about GEMA..." className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] resize-none" maxLength={200} />
         </div>
         <div className="flex gap-2">
           <button type="submit" disabled={loading} className="px-5 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[var(--primary-dark)] disabled:opacity-50">{loading ? "Saving..." : editId ? "Update" : "Add"}</button>
