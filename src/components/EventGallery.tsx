@@ -4,30 +4,49 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
-interface GalleryEvent {
+interface GalleryItem {
   id: string;
-  title: string;
-  date_range: string;
+  image_url: string;
+  event_title: string;
   event_type: string;
-  cover_image_url: string;
 }
 
 export default function EventGallery() {
-  const [events, setEvents] = useState<GalleryEvent[]>([]);
+  const [images, setImages] = useState<GalleryItem[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
   useEffect(() => {
-    supabase
-      .from("events")
-      .select("id, title, date_range, event_type, cover_image_url")
-      .not("cover_image_url", "is", null)
-      .not("cover_image_url", "eq", "")
-      .order("created_at", { ascending: false })
-      .limit(12)
-      .then(({ data }) => setEvents((data as GalleryEvent[]) || []));
+    async function load() {
+      const { data } = await supabase
+        .from("event_images")
+        .select("id, image_url, events(title, event_type)")
+        .limit(20);
+
+      if (!data) return;
+
+      const mapped: GalleryItem[] = data
+        .filter((d: Record<string, unknown>) => d.events)
+        .map((d: Record<string, unknown>) => {
+          const event = d.events as Record<string, string>;
+          return {
+            id: d.id as string,
+            image_url: d.image_url as string,
+            event_title: event.title,
+            event_type: event.event_type,
+          };
+        });
+
+      for (let i = mapped.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [mapped[i], mapped[j]] = [mapped[j], mapped[i]];
+      }
+
+      setImages(mapped);
+    }
+    load();
   }, []);
 
   function handleMouseDown(e: React.MouseEvent) {
@@ -49,11 +68,10 @@ export default function EventGallery() {
 
   function scroll(direction: "left" | "right") {
     if (!scrollRef.current) return;
-    const amount = 320;
-    scrollRef.current.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
+    scrollRef.current.scrollBy({ left: direction === "left" ? -320 : 320, behavior: "smooth" });
   }
 
-  if (events.length === 0) return null;
+  if (images.length === 0) return null;
 
   return (
     <section className="py-16">
@@ -79,24 +97,23 @@ export default function EventGallery() {
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
-            {events.map((event) => (
+            {images.map((item) => (
               <Link
-                key={event.id}
-                href={event.event_type === "exhibition" ? "/events/exhibitions" : "/events/social"}
+                key={item.id}
+                href={item.event_type === "exhibition" ? "/events/exhibitions" : "/events/social"}
                 className="flex-shrink-0 w-72 sm:w-80 group/card"
                 draggable={false}
               >
                 <div className="relative h-52 rounded-xl overflow-hidden shadow-md">
                   <img
-                    src={event.cover_image_url}
-                    alt={event.title}
+                    src={item.image_url}
+                    alt={item.event_title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105"
                     draggable={false}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-white font-bold text-sm leading-tight">{event.title}</h3>
-                    <p className="text-white/80 text-xs mt-1">{event.date_range}</p>
+                    <h3 className="text-white font-bold text-sm leading-tight">{item.event_title}</h3>
                   </div>
                 </div>
               </Link>
