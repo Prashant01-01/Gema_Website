@@ -75,11 +75,11 @@ export default function EventDetail({ id }: { id: string }) {
           <Link href={backLink} className="inline-flex items-center text-red-100 hover:text-white mb-4 text-sm transition-colors">
             ← Back to {backLabel}
           </Link>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">{event.title}</h1>
-          <div className="flex flex-wrap gap-4 text-red-100 text-sm">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">{event.title}</h1>
+          <div className="flex flex-wrap gap-4 text-red-100 text-base">
             <span>📅 {event.date_range}</span>
             {event.venue && <span>📍 {event.venue}</span>}
-            <span className={`px-3 py-0.5 rounded-full text-xs font-bold ${event.status === "Upcoming" ? "bg-green-500/20 text-green-200" : "bg-white/20 text-white"}`}>
+            <span className={`px-3 py-1 rounded-full text-sm font-bold ${event.status === "Upcoming" ? "bg-green-500/20 text-green-200" : "bg-white/20 text-white"}`}>
               {event.status}
             </span>
           </div>
