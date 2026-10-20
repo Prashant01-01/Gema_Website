@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 interface GalleryItem {
   id: string;
   image_url: string;
+  event_id: string;
   event_title: string;
   event_type: string;
 }
@@ -34,6 +35,7 @@ export default function EventGallery() {
           return {
             id: d.id as string,
             image_url: d.image_url as string,
+            event_id: d.event_id as string,
             event_title: event.title,
             event_type: event.event_type,
           };
@@ -100,7 +102,7 @@ export default function EventGallery() {
             {images.map((item) => (
               <Link
                 key={item.id}
-                href={item.event_type === "exhibition" ? "/events/exhibitions" : "/events/social"}
+                href={`/events/${item.event_id}`}
                 className="flex-shrink-0 w-72 sm:w-80 group/card"
                 draggable={false}
               >

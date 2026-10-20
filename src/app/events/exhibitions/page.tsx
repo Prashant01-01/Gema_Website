@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import { supabase } from "@/lib/supabase";
 
@@ -20,20 +21,18 @@ export default function ExhibitionsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
           {events.map((event) => (
-            <div key={event.id} className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+            <Link key={event.id} href={`/events/${event.id}`} className="block bg-white rounded-xl p-8 shadow-sm border border-gray-100 hover:shadow-lg hover:border-[var(--gold)] transition-all group">
               <div className="flex items-start justify-between mb-4">
-                <h2 className="text-xl font-bold text-[var(--gray-800)]">{event.title}</h2>
+                <h2 className="text-xl font-bold text-[var(--gray-800)] group-hover:text-[var(--primary)] transition-colors">{event.title}</h2>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${event.status === "Upcoming" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{event.status}</span>
               </div>
-              <p className="text-[var(--gray-600)] mb-4">{event.description}</p>
+              <p className="text-[var(--gray-600)] mb-4 break-words line-clamp-3">{event.description}</p>
               <div className="flex flex-col sm:flex-row gap-4 text-sm text-[var(--gray-600)]">
                 <span>📅 {event.date_range}</span>
                 <span>📍 {event.venue}</span>
               </div>
-              {event.status === "Completed" && event.photo_gallery_url && (
-                <a href={event.photo_gallery_url} className="inline-block mt-4 text-[var(--primary)] font-medium text-sm hover:underline">View Photo Gallery →</a>
-              )}
-            </div>
+              <span className="inline-block mt-4 text-[var(--primary)] font-medium text-sm group-hover:underline">View Details & Photos →</span>
+            </Link>
           ))}
           {events.length === 0 && <p className="text-center text-[var(--gray-600)] py-8">No exhibitions listed yet.</p>}
         </div>
