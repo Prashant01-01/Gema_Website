@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import BannerAd from "@/components/BannerAd";
 import EventGallery from "@/components/EventGallery";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
 import { supabase } from "@/lib/supabase";
 
 interface Announcement { id: string; title: string; description: string; badge: string; }
@@ -139,6 +140,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <TestimonialCarousel />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
         <BannerAd position="bottom" />
